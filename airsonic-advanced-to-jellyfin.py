@@ -34,6 +34,13 @@ Jellyfin:
 	Create playlists and add songs to them
 '''
 
+
+'''
+TWEAKABLES
+'''
+
+cred_filename="credentials"
+
 '''
 FUNCTION DELCARATION
 '''
@@ -88,7 +95,7 @@ MAIN PROGRAM LOGIC
 
 # Get Config File
 
-cred_exist(".credentials")
+cred_exist(cred_filename)
 cred_read()
 
 
