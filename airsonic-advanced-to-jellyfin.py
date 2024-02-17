@@ -104,7 +104,7 @@ def airsonic_starred():
 		air_stars[sid]["track"]=song.get("track","")
 		
 
-def jellyfin_rest(page,args="NULL"):
+def jellyfin_rest(page,args="NULL",http_method="GET"):
 	# Log In with Username Code
 	if page == "Users/AuthenticateByName":
 		login = { "Username" : jel["user"], "Pw" : jel["pass"] }
@@ -129,11 +129,11 @@ def jellyfin_rest(page,args="NULL"):
 			url = jel["url"]+"/"+page+"?"+args
 		hdr = { 
 			"accept" : "application/json",
-         "x-emby-authorization":'MediaBrowser Client="Jellyfin CLI",Device="Jellyfin-CLI", DeviceId="None", Version="10.8.0"',
+         "x-emby-authorization":'MediaBrowser Client="Jellyfin CLI",Device="Jellyfin-CLI", DeviceId="None", Version="10.8.13"',
 			"accept" : "application/json",
 			"x-mediabrowser-token": jel_token
 		}
-		req = urllib.request.Request(url,headers=hdr)
+		req = urllib.request.Request(url,headers=hdr,method=http_method)
 		data = urllib.request.urlopen(req)
 		usable=json.loads(data.read())
 	return usable
@@ -143,8 +143,8 @@ def jellyfin_gettoken():
 	global jel_uid
 	
 	# Log In and get AccessToken
-	jel_token = jellyfin_rest("Users/AuthenticateByName","")["AccessToken"]
-	jel_uid = jellyfin_rest("Users/AuthenticateByName","")["User"]["Id"]
+	jel_token = jellyfin_rest("Users/AuthenticateByName","","POST")["AccessToken"]
+	jel_uid = jellyfin_rest("Users/AuthenticateByName","","POST")["User"]["Id"]
 	
 
 def jellyfin_findsong(title,band,album="",track=""):
@@ -152,8 +152,15 @@ def jellyfin_findsong(title,band,album="",track=""):
 	# Find a song by Title, Artist, and Album (if available). Will then cross reference Track Number (if available)
 	if(album!=""):
 		args=args+"&albums="+ursafe(album)
-	return jellyfin_rest("Users/"+jel_uid+"/Items",args)
+	#if(track!=""):
+	#	args=args+"&track="+ursafe(album)
+	return jellyfin_rest("Users/"+jel_uid+"/Items",args,"GET")
 	
+def jellyfin_favoritesong(songid):
+	jellyfin_rest("Users/"+jel_uid+"/FavoriteItems/"+songid,"","POST")
+
+def jellyfin_getsong(songid):
+	return jellyfin_rest("Users/"+jel_uid+"/Items/"+songid,"","GET")
 
 
 '''
@@ -165,9 +172,19 @@ def main():
 
 	cred_exist(cred_filename)
 	cred_read()
-	
+		
 	airsonic_starred()
 	jellyfin_gettoken()
-	print(jellyfin_findsong("PDA","Interpol","Turn on the Bright Lights",4))
+
+	new_fave=jellyfin_findsong(air_stars[astar]["title"],air_stars[astar]["artist"],air_stars[astar]["album"],air_stars[astar]["track"])
+	#for astar in air_stars:
+		#new_fave=jellyfin_findsong(air_stars[astar]["title"],air_stars[astar]["artist"],air_stars[astar]["album"],air_stars[astar]["track"])
+		#try:
+		#	jel_id=new_fave["Items"][0]["Id"]
+		#except:
+		#	print("DEUBG: "+air_stars[astar]["title"]+" - "+air_stars[astar]["artist"]+" - "+air_stars[astar]["album"]+" - "+air_stars[astar]["track"])
+		#	print(new_fave)
+		#jellyfin_favoritesong(jel_id)
+	
 
 main()

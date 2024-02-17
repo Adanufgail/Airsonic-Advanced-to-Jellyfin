@@ -12,3 +12,8 @@ REQUIREMENTS:
 
 - Python 3
 - [thefuzz](https://github.com/seatgeek/thefuzz)
+
+CREDENTIALS
+
+Copy credentials.example to be named "credentials"
+Create an Airsonic password using encrypted-aes-GCM
