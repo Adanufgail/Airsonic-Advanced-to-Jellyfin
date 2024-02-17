@@ -7,3 +7,8 @@ This tool will look for a specific credentials file (named "credentials") which 
 Current Functionality:
 
 At present, it authenticates with Airsonic, pulls all starred songs from Airsonic, can authenticate with Jellyfin, and can search for songs.
+
+REQUIREMENTS:
+
+- Python 3
+- [thefuzz](https://github.com/seatgeek/thefuzz)
